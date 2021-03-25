@@ -79,7 +79,6 @@ class VKMusic:
 
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.INFO)
-        self.logger.addHandler(logging.StreamHandler(sys.stdout))
         self.logger.addHandler(logger_handler)
 
         self.logger.info('Initialization...')
