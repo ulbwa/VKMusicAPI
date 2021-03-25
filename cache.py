@@ -1,5 +1,5 @@
 import sqlite3
-from results import SearchResult
+from .results import SearchResult
 from datetime import datetime
 from threading import Thread
 from time import sleep
