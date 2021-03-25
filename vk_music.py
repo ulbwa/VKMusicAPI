@@ -12,8 +12,8 @@ from threading import Thread
 from requests import Session
 from random import choice
 
-from results import Account, SearchResult, DownloadResult
-from cache import Cache
+from .results import Account, SearchResult, DownloadResult
+from .cache import Cache
 
 
 def asyncer(func, *args, **kwargs):
