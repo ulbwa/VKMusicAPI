@@ -25,7 +25,7 @@ class Cache:
                 'CREATE TABLE tracks ('
                 'id TEXT, artist TEXT, '
                 'title TEXT, duration INTEGER,'
-                'url TEXT, delete INTEGER)')
+                'url TEXT, delete_time INTEGER)')
         except sqlite3.OperationalError:
             pass
 
@@ -39,7 +39,7 @@ class Cache:
             cursor = connection.cursor()
             sleep(3600)
             try:
-                cursor.execute('DELETE FROM tracks WHERE delete < %s;',
+                cursor.execute('DELETE FROM tracks WHERE delete_time < %s;',
                                (int(datetime.utcnow().timestamp()),))
             except Exception as error:
                 print("Error in transction Reverting all other operations of a transction ", error)
@@ -99,7 +99,7 @@ class Cache:
         cursor = connection.cursor()
 
         cursor.execute('INSERT INTO tracks ('
-                       'id, artist, title, duration, url, delete)'
+                       'id, artist, title, duration, url, delete_time)'
                        ' VALUES(?, ?, ?, ?, ?, ?)',
                        (data.id, data.artist, data.title,
                         data.duration, data.url,
