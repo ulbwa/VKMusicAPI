@@ -1,4 +1,6 @@
 import sqlite3
+from json import dumps, loads
+
 from .results import SearchResult
 from datetime import datetime
 from threading import Thread
@@ -26,6 +28,14 @@ class Cache:
                 'id TEXT, artist TEXT, '
                 'title TEXT, duration INTEGER,'
                 'url TEXT, delete_time INTEGER)')
+        except sqlite3.OperationalError:
+            pass
+
+        try:
+            cursor.execute(
+                'CREATE TABLE users ('
+                'id INTEGER, audios TEXT, '
+                'delete_time INTEGER)')
         except sqlite3.OperationalError:
             pass
 
@@ -126,6 +136,37 @@ class Cache:
     def track_exists(self, track_id: str) -> bool:
         try:
             self.get_audio(track_id)
+            return True
+        except TypeError:
+            return False
+
+    def set_user_audios(self, user_id: int, tracks: list):
+        connection = sqlite3.connect(self.database_name)
+        cursor = connection.cursor()
+
+        cursor.execute('INSERT INTO users ('
+                       'id, audios, delete_time) '
+                       'VALUES(?, ?, ?)',
+                       (user_id, dumps(tracks),
+                        datetime.utcnow().timestamp() + 3600))
+
+        connection.commit()
+        connection.close()
+
+    def get_user_audios(self, user_id: int):
+        connection = sqlite3.connect(self.database_name)
+        cursor = connection.cursor()
+
+        cursor.execute('SELECT audios FROM users WHERE id = (?)',
+                       (user_id,))
+        fetch = loads(cursor.fetchone()[0])
+        connection.close()
+
+        return fetch
+
+    def user_exists(self, user_id: int):
+        try:
+            self.get_user_audios(user_id)
             return True
         except TypeError:
             return False

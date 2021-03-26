@@ -3,7 +3,6 @@ import functools
 import hashlib
 
 import logging
-import sys
 import music_tag
 
 from fake_headers import Headers
@@ -173,6 +172,10 @@ class VKMusic:
             return False
 
     async def get_user_audio(self, user_id: int):
+        if self.cache.user_exists(user_id):
+            tracks = self.cache.get_user_audios(user_id)
+            return [(await self.get_audio(a))[0] for a in tracks]
+
         req = await asyncer(self.request, 'audio.get',
                             params={'count': 1000, 'offset': 0, 'owner_id': user_id,
                                     "access_token": choice(self.accounts)['access_token'],
@@ -187,6 +190,8 @@ class VKMusic:
             if not await asyncer(self.cache.track_exists, '{}_{}'.format(a['owner_id'], a['id'])):
                 await asyncer(self.cache.dump_audio, parse_track_data(a))
             output.append(parse_track_data(a))
+
+        self.cache.set_user_audios(user_id, [a.id for a in output])
 
         return output
 
