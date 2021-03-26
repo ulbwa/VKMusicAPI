@@ -230,7 +230,7 @@ class VKMusic:
 
         return output
 
-    async def download_audio(self, track_id: str):
+    async def download(self, track_id: str):
         track = await self.get_audio(track_id)
         if not track:
             return False
