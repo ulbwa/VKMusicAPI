@@ -53,6 +53,12 @@ class Cache:
                                (int(datetime.utcnow().timestamp()),))
             except Exception as error:
                 print("Error in transction Reverting all other operations of a transction ", error)
+            try:
+                cursor.execute('DELETE FROM users WHERE delete_time < %s;',
+                               (int(datetime.utcnow().timestamp()),))
+            except Exception as error:
+                print("Error in transction Reverting all other operations of a transction ", error)
+
             connection.close()
 
     def get_token(self, account_hash: str) -> dict:
