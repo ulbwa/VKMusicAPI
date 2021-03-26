@@ -172,8 +172,8 @@ class VKMusic:
             return False
 
     async def get_user_audio(self, user_id: int):
-        if self.cache.user_exists(user_id):
-            tracks = self.cache.get_user_audios(user_id)
+        if await asyncer(self.cache.user_exists, user_id):
+            tracks = await asyncer(self.cache.get_user_audios, user_id)
             return [(await self.get_audio(a))[0] for a in tracks]
 
         req = await asyncer(self.request, 'audio.get',
@@ -196,8 +196,8 @@ class VKMusic:
         return output
 
     async def get_audio(self, track_id: str):
-        if self.cache.track_exists(track_id):
-            return [self.cache.get_audio(track_id)]
+        if await asyncer(self.cache.track_exists, track_id):
+            return [await asyncer(self.cache.get_audio, track_id)]
 
         req = await asyncer(self.request, 'audio.get',
                             params={'count': 1000, 'offset': 0, 'owner_id': track_id.split('_')[0],
