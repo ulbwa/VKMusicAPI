@@ -11,7 +11,7 @@ from threading import Thread
 from requests import Session
 from random import choice
 
-from .results import Account, SearchResult, DownloadResult
+from .results import Account, SearchResult, DownloadResult, Captcha
 from .cache import Cache
 
 
@@ -176,13 +176,19 @@ class VKMusic:
             tracks = await asyncer(self.cache.get_user_audios, user_id)
             return [(await self.get_audio(a))[0] for a in tracks]
 
+        account = choice(self.accounts)
         req = await asyncer(self.request, 'audio.get',
                             params={'count': 1000, 'offset': 0, 'owner_id': user_id,
-                                    "access_token": choice(self.accounts)['access_token'],
+                                    "access_token": account['access_token'],
                                     "v": self.api_version})
+
+        # result['error']['error_msg'] == 'Captcha needed'
 
         if not req:
             return False
+
+        if req.get('error', dict()).get('error_msg') == 'Captcha needed':
+            return Captcha(account['access_token'], req["error"]["captcha_sid"], req["error"]["captcha_img"])
 
         output = list()
 
@@ -280,3 +286,9 @@ class VKMusic:
             duration=track.duration,
             file=directory
         )
+
+    async def captcha(self, account: str, captcha_id: str, captcha: str):
+        return await asyncer(self.request, 'audio.get',
+                             params={'count': 1, 'offset': 0, 'owner_id': 55325758,
+                                     'captcha_sid': captcha_id, 'captcha_key': captcha,
+                                     'access_token': account, 'v': self.api_version})

@@ -23,3 +23,10 @@ class DownloadResult:
     title: str
     duration: int
     file: str
+
+
+@dataclass
+class Captcha:
+    account: str
+    id: str
+    url: str
