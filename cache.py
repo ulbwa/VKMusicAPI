@@ -41,7 +41,7 @@ class Cache:
 
         connection.close()
 
-        Thread(target=self.deleter).start()
+        Thread(target=self.deleter, daemon=True).start()
 
     def deleter(self):
         while True:
