@@ -24,7 +24,7 @@ def asyncer(func, *args, **kwargs):
 
 
 def threader(func, *args):
-    return Thread(target=func, args=args)
+    return Thread(target=func, args=args, daemon=True)
 
 
 def parse_track_data(data: dict):
