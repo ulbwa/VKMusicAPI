@@ -270,14 +270,17 @@ class VKMusic:
         with open(directory, 'wb') as f:
             f.write(crypted_audio.content)
 
-        tag = music_tag.load_file(directory)
+        try:
+            tag = music_tag.load_file(directory)
 
-        tag['artist'] = track.artist
-        tag['tracktitle'] = track.title
+            tag['artist'] = track.artist
+            tag['tracktitle'] = track.title
 
-        tag['genre'] = self.comment
+            tag['genre'] = self.comment
 
-        tag.save()
+            tag.save()
+        except Exception as e:
+            self.logger.error('Exception!', exc_info=e)
 
         return DownloadResult(
             id=track.id,
